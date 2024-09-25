@@ -1,0 +1,3 @@
+directive @aws_api_key on OBJECT | INTERFACE | INPUT_OBJECT | UNION | ENUM | SCALAR | FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+directive @aws_cognito_user_pools on OBJECT | INTERFACE | INPUT_OBJECT | UNION | ENUM | SCALAR | FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+directive @aws_subscribe(mutations: [String!]!) on FIELD_DEFINITION

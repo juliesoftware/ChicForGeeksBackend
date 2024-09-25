@@ -1,0 +1,16 @@
+{
+  "name": "send-message",
+  "includeLibs": true,
+  "timeout": 10,
+  "dependencies": [
+    "uuid@9.0.0"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Mutation",
+        "field": "sendMessage"
+      }
+    }
+  ]
+}

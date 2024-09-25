@@ -1,0 +1,15 @@
+{
+  "name": "create-user",
+  "includeLibs": true,
+  "dependencies": [
+    "axios@0.27.2"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Mutation",
+        "field": "createUser"
+      }
+    }
+  ]
+}

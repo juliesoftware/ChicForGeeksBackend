@@ -1,0 +1,10 @@
+config:
+  aws-infrastructure:arango_password:
+    secure: AAABACjEkGv6aP4roLryuAix5J78sxkp+Zg6alYRGnIFFDxwRtgLMR0FceME
+  aws-infrastructure:arango_username:
+    secure: AAABAIX5kzizD+NLOIHK2wcMp64kebJJsQLoT0tpu/qCy8mdvLOyQk6e
+  aws-infrastructure:stage: prod
+  aws-infrastructure:url: http://3.84.251.210:8529/_db/nomadago/_api/
+  aws-infrastructure:userPoolId: us-east-1_ZzOuuKMNm
+  aws-infrastructure:webClientId: 5qr0phja1v5mf7s0oohleuo1kr
+  aws:region: us-east-1

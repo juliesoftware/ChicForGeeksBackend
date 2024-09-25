@@ -1,0 +1,15 @@
+{
+  "name": "join",
+  "includeLibs": true,
+  "dependencies": [
+    "axios@0.27.2"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Query",
+        "field": "join"
+      }
+    }
+  ]
+}

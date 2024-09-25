@@ -1,0 +1,15 @@
+{
+  "name": "users-in-channel",
+  "includeLibs": false,
+  "dependencies": [
+    "axios@0.27.2"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Query",
+        "field": "usersInChannel"
+      }
+    }
+  ]
+}

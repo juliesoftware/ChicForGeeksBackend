@@ -1,0 +1,11 @@
+config:
+  aws-infrastructure:WEBSOCKET_ENDPOINT: wss://t0wqcyr9u8.execute-api.us-east-1.amazonaws.com/syst
+  aws-infrastructure:arango_password:
+    secure: AAABAEN98wnO4a8HbiFPDoMFxns9+RKX20xWWuUe5pp4l4coGKsG3A==
+  aws-infrastructure:arango_username:
+    secure: AAABAA3C8wvRpKWg/tf3mmTzo+B/2kEoMubeFI0u1E8QYoFs8+Y=
+  aws-infrastructure:stage: syst
+  aws-infrastructure:url: http://3.82.94.248:8529/_db/nomadago/_api/
+  aws-infrastructure:userPoolId: us-east-1_CRlJlpNfe
+  aws-infrastructure:webClientId: 5hvv18h418vd1mf45lq7peo846
+  aws:region: us-east-1

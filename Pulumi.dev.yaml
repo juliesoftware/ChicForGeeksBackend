@@ -1,0 +1,5 @@
+config:
+  aws-infrastructure:stage: dev
+  aws:region: us-east-1
+  aws-infrastructure:url: http://3.84.251.210:8529/_db/nomadago/_api/
+  userPoolId: us-east-1_QdWKGTwAE

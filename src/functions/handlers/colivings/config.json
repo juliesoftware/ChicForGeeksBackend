@@ -1,0 +1,15 @@
+{
+  "name": "colivings",
+  "includeLibs": true,
+  "dependencies": [
+    "axios@0.27.2"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Query",
+        "field": "colivings"
+      }
+    }
+  ]
+}

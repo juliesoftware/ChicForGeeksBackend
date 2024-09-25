@@ -1,0 +1,15 @@
+{
+  "name": "update-channel-admin",
+  "includeLibs": false,
+  "dependencies": [
+    "uuid@9.0.0"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Mutation",
+        "field": "updateChannelAdmin"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "update-channel-members",
+  "includeLibs": true,
+  "dependencies": [
+    "uuid@9.0.0",
+    "axios@0.27.2"
+  ],
+  "appsync": [
+    {
+      "resolver": {
+        "type": "Mutation",
+        "field": "updateChannelMembers"
+      }
+    }
+  ]
+}
