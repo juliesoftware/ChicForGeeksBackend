@@ -1,881 +1,136 @@
+# ENUMS
 enum ActionTaken {
-    ACCEPTED
-    DECLINED
+  ACCEPTED
+  DECLINED
 }
 
-input AddPlanInput {
-    id: String
-    name: String
-    start: String
-    end: String
-    owner: String
-    description: String
-    private: Boolean
-    location: LocationInput
-    status: [PlanStatus]
-    coverImage: String
-    type: PlanType
-    activities: [Activity]
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
 }
 
-input AddTripInput {
-    id: String
-    name: String
-    start: String
-    end: String
-    owner: String
-    description: String
-    private: Boolean
-    location: LocationInput
-    status: [PlanStatus]
-    coverImage: String
-    type: PlanType
+enum WorkoutIntensity {
+  LOW
+  MEDIUM
+  HIGH
 }
 
-input AddEventInput {
-    id: String
-    name: String
-    start: String
-    end: String
-    owner: String
-    description: String
-    private: Boolean
-    location: LocationInput
-    status: [PlanStatus]
-    coverImage: String
-    type: PlanType
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
 
-
-type Comment {
-    id: String
-    text: String
-    owner: User
-    plan: Plan
-    created_date: String
-    likeCount: Int
-    likes: [User]
+# INPUTS
+input UserInput {
+  name: String!
+  email: String!
+  password: String!
+  age: Int
+  gender: Gender
+  goals: String
+  preferredWorkoutTimes: [String]
+  chatEnabled: Boolean
 }
 
-input FeedFilter {
-    kind: FeedType
-    country: String
+input MealPlanInput {
+  name: String!
+  type: MealType
+  description: String
+  calories: Int
+  proteins: Int
+  fats: Int
+  carbs: Int
 }
 
-enum FeedType {
-    PUBLIC
-    PRIVATE
+input WorkoutPlanInput {
+  name: String!
+  description: String
+  intensity: WorkoutIntensity
+  durationMinutes: Int
+  exercises: [ExerciseInput]
 }
 
-type Friendship {
-    _id: String
-    _from: String
-    _to: String
-    _key: String
-    blocked: Boolean
-    requested: Boolean
-}
-
-enum FriendshipType {
-    FRIEND
-    REQUESTED
-    REQUESTED_BY
-    BLOCKED
-    BLOCKED_BY
-    STRANGER
-}
-
-type GetCommentsResponse {
-    results: [Comment]
-    page: Page
-}
-
-type GetNotificationsResponse {
-    results: [Notification]
-    page: Page
-    unseenCount: Int
-}
-
-type GetChannelsResponse {
-    results: [ChannelsResult]
-    page: Page
-}
-
-type GetPlansResponse {
-    results: [Plan]
-    page: Page
-}
-
-type GetUsersResponse {
-    results: [User]
-    page: Page
-}
-
-type GetPhoneSearchResponse {
-    results: [PhoneSearchResult]
-}
-
-type GetPaginatedColivingResponse {
-    results: [ColivingResult],
-    page: Page
-}
-
-type GetPaginatedCoworkingResponse {
-    results: [CoworkingResult],
-    page: Page
-}
-
-type GetBusinessResponse {
-    name: String,
-    colivings: [ColivingResult],
-    coworkings: [CoworkingResult]
-}
-
-type GetPopularCountriesResponse {
-    results: [PopularCountriesResult]
-}
-
-type GetChatResponse {
-    results: [Chat]
-    page: Page
-}
-
-type GetMessageResponse {
-    results: [Message]
-    page: Page
-}
-
-type Join {
-    _id: String
-    _from: String
-    _to: String
-    _key: String
-    joinStatus: JoinType,
-    start: String,
-    end: String
-}
-
-type JoinRequest {
-    date: String
-    target: User
-}
-
-enum JoinType {
-    UNJOIN
-    REQUESTED
-    INVITED
-    JOINED
-    HIDDEN
-}
-
-enum CospaceServiceType {
-    COLIVING
-    COWORKING
-}
-
-enum CospaceState {
-    HIDDEN
-    VERIFIED
-}
-
-type Like {
-    _id: String
-    _from: String
-    _to: String
-    _key: String
-}
-
-type Location {
-    city: String
-    lat: Float
-    lng: Float
-    country: String
-    displayName: String
-    placeId: String
-    fullAddress: String
-}
-
-input ColivingLocationInput {
-    city: String
-    lat: Float
-    lng: Float
-    country: String
-    displayName: String
-    placeId: String
-    fullAddress: String
-}
-
-input CoworkingLocationInput {
-    city: String
-    lat: Float
-    lng: Float
-    country: String
-    displayName: String
-    placeId: String
-    fullAddress: String
-}
-
-input LocationInput {
-    city: String
-    lat: Float
-    lng: Float
-    country: String
-    displayName: String
-    placeId: String
-}
-
-input MapSearch {
-    boundingBox: [[Float!]!]!
-}
-
-type Subscription {
-    onMessageAdded(channelId: String!): Message @aws_subscribe(mutations: ["sendMessage", "sendReply", "updateChannelMembers"])
-    onChannelsUpdate: Message @aws_subscribe(mutations: ["sendMessage", "sendReply", "updateChannelMembers"])
-}
-
-type Mutation {
-    addPlan(userId: String!, delete: Boolean, planInput: AddPlanInput!, usersToAdd: [String]): Plan
-    addTrip(tripInput: AddTripInput!): Trip
-    addEvent(eventInput: AddEventInput!): Event
-    updateUserLocation(userId: String!, locationInput: LocationInput): Location
-    updateUser(userId: String!, userInput: UserInput): User
-    createUser(name: String!, username: String!, email: String!): User
-    updateColiving(colivingId: String, colivingInput: ColivingInput): ColivingResult
-    updateCoworking(coworkingId: String, coworkingInput: CoworkingInput): CoworkingResult
-    createColiving(colivingInput: ColivingInput): ColivingResult
-    deleteColiving(colivingId: String): String
-    createCoworking(coworkingInput: CoworkingInput): CoworkingResult
-    deleteCoworking(coworkingId: String): String
-    friendship(
-        requester: String!,
-        requestee: String!,
-        accept: Boolean,
-        blocked: Boolean,
-        unfriend: Boolean
-    ): Friendship
-    like(requester: String!, object: String!, like: Boolean!): Like
-    comment(
-        id: String,
-        text: String!,
-        userId: String!,
-        objectId: String!,
-        delete: Boolean,
-        taggedUsers: [String]
-    ): Comment
-    join(
-        user: String!,
-        plan: String!,
-        joinType: JoinType!,
-        requester: String,
-        start: String,
-        end: String
-    ): Join
-    notification(id: String, seen: Boolean, actionTaken: ActionTaken): Notification
-    claimColiving(businessId: String!, colivingIds: [String!]!): String
-    claimCoworking(businessId: String!, coworkingIds: [String!]!): String
-    createChannel(users: [String!]!, name: String, chatType: ChatType): Channel
-    updateChannelMembers(channelId: String!, name: String, membersToAdd: [String], membersToRemove: [String]): Message
-    updateChannelAdmin(userId: String!, channelId: String!, admin: Boolean!): Boolean
-    createBusiness(businessInput: BusinessInput!): GetBusinessResponse
-    addBusinessUser(businessUserInput: BusinessUserInput!): String
-    unlinkIdp(providerName: String!, idpUserId: String!): String
-    sendMessage(channelId: String!, senderId: String!, messageType: MessageType!, data: String!, attachment: AttachmentInput): Message
-    sendReply(channelId: String!, senderId: String!, messageType: MessageType!, data: String!, attachment: AttachmentInput, replyToMessageId: String!): Message
-    markMessagesAsRead(channelId: String!, userId: String!): Boolean
-    updateMuteStatus(channelId: String!, isMuted: Boolean!): Channel
-}
-
-type Notification {
-    id: String
-    text: String
-    deepLink: String
-    image: String
-    created_at: String
-    user: User
-    originId: String
-    originName: String
-    notificationType: NotificationType
-    seen: Boolean
-    actionTaken: ActionTaken
-    originUser: User
-    originPlan: Plan
-    relatedUser: User
-    relatedPlan: Plan
-    otherUser: User
-    otherPlan: Plan
-    deletedName: String
-}
-
-union NotificationOrigin = Plan | User
-
-enum NotificationType {
-    FRIEND_REQUESTED
-    FRIEND_ACCEPTED
-    PLAN_JOIN_REQUEST
-    PLAN_JOIN_REQUEST_APPROVED
-    PLAN_INVITE
-    PLAN_INVITE_ACCEPTED
-    PLAN_DELETED
-    NEARBY_FRIEND
-    PLAN_COMMENT
-    TAG
-    FUTURE_PLAN_OVERLAP
-    LIKED_PLAN
-    LIKED_COMMENT
-}
-
-# OUTPUT
-type Page {
-    pageSize: Int
-    hasNext: Boolean
-    total: Int
-    nextCursor: String
-}
-
-# INPUT
-input PageInput {
-    count: Int!
-    page: Int
-    cursor: String
-}
-
-type PhoneNumber {
-    countryCode: String
-    digits: String
-}
-
-input PhoneNumberInput {
-    countryCode: String
-    digits: String
-}
-
-type Chat {
-    participants: [String]
-    created_at: String
-    updated_at: String
+input ExerciseInput {
+  name: String!
+  repetitions: Int!
+  sets: Int!
 }
 
 input ChatInput {
-    participants: [String!]!
-    created_at: String
-    updated_at: String
+  message: String!
+  senderId: String!
+  receiverId: String!
 }
 
-type Message {
-    id: String
-    channelId: String
-    senderId: String
-    data: String
-    messageType: MessageType
-    createdAt: String
-    updatedAt: String
-    repliesCount: Int
-    replyToMessageId: String
-    attachment: Attachment
-}
-
-union Attachment = MediaAttachment | PlanAttachment
-
-input AttachmentInput {
-    media: MediaAttachmentInput
-    plan: PlanAttachmentInput
-    # Add fields for other attachment types...
-}
-
-enum MediaType {
-  Image,
-  Video
-}
-
-type MediaItem {
-  mediaType: MediaType
-  reference: String
-}
-
-input MediaItemInput {
-  mediaType: MediaType
-  reference: String
-}
-
-type MediaAttachment {
-  data: [MediaItem]
-}
-
-input MediaAttachmentInput {
-  data: [MediaItemInput!]!
-}
-
-type PlanAttachment {
-    planId: String!
-}
-
-input PlanAttachmentInput {
-    planId: String!
-}
-
-type Reply {
-    id: String
-    channelId: String
-    senderId: String
-    data: String
-    messageType: MessageType
-    createdAt: String
-    updatedAt: String
-    replyToMessageId: String
-}
-
-enum MessageType {
-    TEXT,
-    MEDIA,
-    GIF,
-    PLAN_REFERENCE,
-    SYSTEM_MESSAGE
-}
-
-input MessageInput {
-    chatId: String!
-    senderId: String!
-    text: String!
-    created_at: String
-    updated_at: String
-}
-
-type Plan {
-    id: String!
-    name: String
-    start: String
-    end: String
-    private: Boolean
-    owner: User
-    created_at: String
-    updated_at: String
-    description: String
-    counters: PlanCounters
-    location: Location
-    hasLiked: Boolean
-    joinStatus: JoinType
-    status: [PlanStatus]
-    #    comments:[Comment]
-    ########    likes:[User]
-    joined: [User]
-    sponsored: Boolean
-    coverImage: String
-    type: PlanType
-    activities: [Activity]
-}
-
-type Trip {
-    id: String!
-    name: String
-    start: String
-    end: String
-    private: Boolean
-    owner: User
-    created_at: String
-    updated_at: String
-    description: String
-    counters: PlanCounters
-    location: Location
-    hasLiked: Boolean
-    joinStatus: JoinType
-    status: [PlanStatus]
-    joined: [User]
-    sponsored: Boolean
-    coverImage: String
-    type: PlanType
-}
-
-type Event {
-    id: String!
-    name: String
-    start: String
-    end: String
-    private: Boolean
-    owner: User
-    created_at: String
-    updated_at: String
-    description: String
-    counters: PlanCounters
-    location: Location
-    hasLiked: Boolean
-    joinStatus: JoinType
-    status: [PlanStatus]
-    joined: [User]
-    sponsored: Boolean
-    coverImage: String
-    type: PlanType
-}
-
-enum PlanType {
-    RETREAT
-    EVENT
-}
-
-type PlanCounters {
-    joined: Int
-    requests: Int
-    invites: Int
-    likes: Int
-    comments: Int
-}
-
-enum PlanStatus {
-    OFFICIAL
-    TENTATIVE
-    LOOKING_FOR_FRIENDS
-    LOOKING_FOR_ROOMMATES
-    PLANNING
-    BOOKED
-}
-
-input Sort {
-    field: Field
-    direction: Direction
-}
-
-enum Field {
-    UPDATED_AT
-    CREATED_AT
-    START_DATE
-}
-
-enum Direction {
-    ASC
-    DESC
-}
-
-type Query {
-    plan(planId: String!, userId: String): Plan
-    user(userId: String, userName: String, requesterId: String): User
-    userFeed(userId: String!, filters: FeedFilter, page: PageInput, sort: Sort): GetPlansResponse
-    userFeedUpdated(userId: String!, filters: FeedFilter, page: PageInput): GetPlansResponse
-    userPlans(
-        userId: String,
-        userName: String,
-        desc: Boolean,
-        start: String,
-        end: String,
-        page: PageInput,
-        requester: String
-    ): GetPlansResponse
-    userMap(
-        userId: String!,
-        start: String,
-        end: String,
-        mapFilter: MapSearch
-    ): GetPlansResponse
-    userSearch(
-        query: String!,
-        page: PageInput,
-        exact: Boolean,
-        requester: String
-    ): GetUsersResponse
-    userSuggested(userId: String!, mapFilter: MapSearch, page: PageInput): GetUsersResponse
-    friendMap(userId: String!, mapFilter: MapSearch): GetUsersResponse
-    countryPlanSearch(country: String!, page: PageInput): GetPlansResponse
-    friends(
-        requester: String,
-        requestee: String,
-        page: PageInput
-    ): GetUsersResponse
-    friendship(
-        userId: String,
-        userName: String,
-        friendshipType: FriendshipType,
-        query: String,
-        page: PageInput
-    ): GetUsersResponse
-    like(objectId: String!): GetUsersResponse
-    comment(objectId: String!): GetCommentsResponse
-    join(planId: String!, joinType: JoinType, query: String): GetUsersResponse
-    notifications(userId: String!, page: PageInput): GetNotificationsResponse
-    phoneContacts(userId: String!, phoneNumbers: [PhoneNumberInput!]!): GetPhoneSearchResponse
-    business(userId: String!): GetBusinessResponse
-    coworking(coworkingId: String): CoworkingResult
-    coworkings(searchText: String, countryCode: String, city: String, page: PageInput): GetPaginatedCoworkingResponse
-    coworkingsDistance(lat: String!, lng: String!, distance: Int, page: PageInput): GetPaginatedCoworkingResponse
-    coliving(colivingId: String): ColivingResult
-    colivings(searchText: String, countryCode: String, city: String, page: PageInput): GetPaginatedColivingResponse
-    colivingsDistance(lat: String!, lng: String!, distance: Int, page: PageInput): GetPaginatedColivingResponse
-    popularCountries(page: PageInput): GetPopularCountriesResponse
-    chat(userId: String!): GetChatResponse
-    message(chatId: String!): GetMessageResponse,
-    mutualFriends(requester: String, requestee: String): GetUsersResponse,
-    map(
-        requestingUser: String!,
-        from: String!,
-        to: String!,
-        bounds: [[Float!]!]!,
-        includeFriendPlans: Boolean,
-        includeColivings: Boolean
-        includeCoworkings: Boolean
-        includePublicPlans: Boolean
-    ): MapResponse
-    channel(channelId: String!): ChannelsResult
-    channels(page: PageInput): GetChannelsResponse
-    channelsThatIncludesUsers(participants: [String!]!, page: PageInput): GetChannelsResponse
-    previewChat: GetChannelsResponse
-    messages(channelId: String!, page: PageInput): GetMessageResponse
-    replies(messageId: String!, page: PageInput): GetMessageResponse
-    usersInChannel(channelId: String!): [String]
-    isExistingIdp(email: String!): Boolean
-    stats(from: String!, to: String!, userId: String!): StatResult
-    isChannelMember(channelId: String, userId: String, message: MessageInput): Message
-}
-
-type Channel {
-    id: String
-    name: String
-    createdAt: String
-    membersHash: String
-    chatType: ChatType
-    isMuted: Boolean
-}
-
-enum ChatType {
-    DIRECT
-    GROUP
-}
-
-type MapResponse {
-    friendPlans: [UserWithPlan]
-    publicPlans: [UserWithPlan]
-    colivings: [ColivingResult]
-    coworkings: [CoworkingResult]
-}
-
-type CospaceResponse {
-    colivings: [ColivingResult]
-    coworkings: [CoworkingResult]
-}
-
-type UserWithPlan {
-    user: User!
-    plan: Plan!
-}
-
-# DATA MODEL
+# TYPES
 type User {
-    # public
-    id: String!
-    email: String!
-    name: String!
-    username: String!
-    bio: String
-    visitedCountries: [String]
-    phoneNumber: PhoneNumber
-    created_at: String
-    image: String
-    images: [String]
-    banned: Boolean
-    location: Location
-    #    # private
-    ########    requests:[User]
-    friends: [User]
-    mutualFriendsCount: Int
-    friendshipStatus: FriendshipType
-    notificationRange: Float
-    expoToken: String
-    tags: [String]
-    interests: [Activity]
-    home: Home
-    languages: [String]
-    gender: Gender
-    birthDate: BirthDate
-    website: String
+  id: String!
+  name: String!
+  email: String!
+  age: Int
+  gender: Gender
+  goals: String
+  mealPlans: [MealPlan]
+  workoutPlans: [WorkoutPlan]
+  chatEnabled: Boolean
 }
 
-enum Activity {
-  HIKING
-  SCUBADIVING
-  SURFING
-  SKIING
-  SNOWBOARDING
-  DANCING
-  SAILING
-  YOGA
-  BEACH
-  RESTAURANTS
-  COOKING_CLASSES
-  LOCAL_MARKETS
-  MUSEUMS
-  HISTORY_TOURS
-  CULTURAL_FESTIVAL
-  WILDLIFE_TOURS
-  EXPLORING_NATURE
-  WINE_TASTING
-  PARTYING
-  CONCERTS
-  LANGUAGE_CLASSES
-  VOLUNTEERING
+type MealPlan {
+  mealPlanId: String!
+  userId: String!
+  name: String!
+  type: MealType
+  description: String
+  date: String!
+  calories: Int
+  proteins: Int
+  fats: Int
+  carbs: Int
 }
 
-type BirthDate {
-    value: String
-    visibilityLevel: VisibilityLevel
+type WorkoutPlan {
+  id: String!
+  name: String!
+  description: String
+  intensity: WorkoutIntensity
+  durationMinutes: Int
+  exercises: [Exercise]
 }
 
-input BirthDateInput {
-    value: String
-    visibilityLevel: VisibilityLevel
+type Exercise {
+  name: String!
+  repetitions: Int!
+  sets: Int!
 }
 
-type Gender {
-    value: String
-    visibilityLevel: VisibilityLevel
+type Chat {
+  id: String!
+  message: String!
+  sender: User!
+  receiver: User!
+  timestamp: String!
 }
 
-input GenderInput {
-    value: String
-    visibilityLevel: VisibilityLevel
+# MUTATIONS
+type Mutation {
+  createUser(userInput: UserInput!): User
+  createMealPlan(userId: String!, mealPlanInput: MealPlanInput!): MealPlan
+  createWorkoutPlan(userId: String!, workoutPlanInput: WorkoutPlanInput!): WorkoutPlan
+  sendMessage(chatInput: ChatInput!): Chat
 }
 
-type Home {
-    value: Location
-    visibilityLevel: VisibilityLevel
-}
-
-input HomeInput {
-    value: LocationInput
-    visibilityLevel: VisibilityLevel
-}
-
-enum VisibilityLevel {
-    PUBLIC
-    PRIVATE
-    FRIENDS_ONLY
-}
-
-type PhoneSearchResult {
-    id: String
-    email: String
-    name: String
-    username: String
-    bio: String
-    phoneNumber: PhoneNumber
-    created_at: String
-    image: String
-    location: Location
-    friendshipStatus: FriendshipType
-}
-
-type ColivingResult {
-    id: String
-    name: String
-    website: String
-    location: Location
-    logo: String
-    description: String
-    images: String
-    coverImage: String
-    state: CospaceState
-}
-
-type CoworkingResult {
-    id: String
-    name: String
-    website: String
-    location: Location
-    logo: String
-    description: String
-    images: String
-    coverImage: String
-    state: CospaceState
-}
-
-type ChannelsResult {
-    channel: Channel
-    latestMessage: Message,
-    members: [User]
-    unreadMessageCount: Int
-}
-
-type StatResult {
-    topCountries: [PlanDuration]
-    uniqueCountries: [String]
-    percentile: Float
-    plansAttended: Int
-    travelDistance: Int
-    topTravelBuddies: [TravelBuddy]
-    favoriteCountry: PlanDuration
-    rareCountry: RareCountry
-}
-
-type RareCountry {
-    country: String
-    userPercentage: Int
-}
-
-type TravelBuddy {
-    name: String
-    sharedPlansCount: Int
-    image: String
-}
-
-type PlanDuration {
-    country: String
-    durationDays: Int
-}
-
-type PopularCountriesResult {
-    country: String,
-    count: Int
-}
-
-input UserInput {
-    email: String
-    name: String
-    username: String
-    bio: String
-    phoneNumber: PhoneNumberInput
-    image: String
-    images: [String]
-    banned: Boolean
-    notificationRange: Float
-    expoToken: String
-    visitedCountries: [String]
-    tags: [String]
-    interests: [Activity]
-    languages: [String]
-    home: HomeInput
-    gender: GenderInput
-    birthDate: BirthDateInput
-    website: String
-}
-
-input BusinessInput {
-    name: String
-}
-
-input BusinessUserInput {
-    userId: String
-    businessId: String
-}
-
-input ColivingInput {
-    name: String
-    website: String
-    location: ColivingLocationInput
-    logo: String
-    description: String
-    images: String
-    coverImage: String
-    state: CospaceState
-}
-
-input CoworkingInput {
-    name: String
-    website: String
-    location: CoworkingLocationInput
-    logo: String
-    description: String
-    images: String
-    coverImage: String
-    state: CospaceState
+# QUERIES
+type Query {
+  getUser(userId: String!): User
+  getMealPlans(userId: String!): [MealPlan]!
+  getWorkoutPlans(userId: String!): [WorkoutPlan]
+  getChatHistory(senderId: String!, receiverId: String!): [Chat]
 }
 
 schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
+  query: Query
+  mutation: Mutation
 }

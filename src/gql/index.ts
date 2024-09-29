@@ -70,7 +70,7 @@ function generateRoleExec() {
                 {
                     effect: "Allow",
                     actions: ["lambda:invokeFunction"],
-                    resources: ["arn:aws:lambda:*:292274522756:function:*"],
+                    resources: ["arn:aws:lambda:*:640168438272:function:*"],
                 },
             ],
         }).json,
@@ -112,7 +112,7 @@ export default {
         const api = new GraphQLApi(generateName(PREFIX, "appsync"), {
             authenticationType: authenticationType,
             ...(authenticationType === "AMAZON_COGNITO_USER_POOLS" ? {userPoolConfig: authConfig} : {apiKeyConfig: authConfig}),
-            name: generateName(PREFIX, "nomadago"),
+            name: generateName(PREFIX, "coach"),
             schema: (await fs.readFile(path.join("src", "gql", "schema", "schema.graphql"))).toString("utf-8"),
             tags: generateTags(PREFIX, "appsync"),
             xrayEnabled: true,

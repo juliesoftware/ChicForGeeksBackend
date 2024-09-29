@@ -1,9 +1,0 @@
-{
-  "name": "visited-country-job",
-  "includeLibs": true,
-  "dependencies": [
-    "axios@0.27.2"
-  ],
-  "appsync": [
-  ]
-}

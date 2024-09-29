@@ -10,11 +10,7 @@ const config = new pulumi.Config();
 const FUNCTIONS_DIR = path.join(".", "src", "functions");
 const BUILD_ROOT_DIR = path.join(FUNCTIONS_DIR, "dist");
 
-const baseUrl = config.require("url");
 const userPoolId = config.require("userPoolId")
-const webClientId = config.require("webClientId")
-const arangoUsername = config.requireSecret("arango_username")
-const arangoPassword = config.requireSecret("arango_password")
 
 async function buildLayer(functionPackage: { includeLayer: boolean, functionName: string }) {
     if (functionPackage.includeLayer) {
@@ -94,7 +90,6 @@ export default async function generate() {
     if (fsSync.existsSync(BUILD_ROOT_DIR))
         fsSync.rmSync(BUILD_ROOT_DIR, {recursive: true, force: true});
     execSync(`tsc --project ${path.join("src", "functions", "tsconfig.json")}`);
-    execSync(`tsc --project ${path.join("src", "layer", "tsconfig.json")}`);
 
     const functionPackages = await Promise.all(
         functions.map(async (functionName: string) => {
@@ -141,15 +136,11 @@ export default async function generate() {
                 code: new pulumi.asset.FileArchive(functionPath),
                 role: permRole.arn,
                 handler: "code/index.handler",
-                runtime: "nodejs16.x",
+                runtime: "nodejs20.x",
                 name: generateName(SERVICE_PREFIX, functionPackage.name),
                 environment: {
                     variables: {
-                        url: baseUrl,
-                        userPool: userPoolId,
-                        webClientId: webClientId,
-                        arangoUsername: arangoUsername,
-                        arangoPassword: arangoPassword
+                        userPool: userPoolId
                     }
                 },
                 layers: layerArn ? [layerArn] : undefined, // Add the layer here

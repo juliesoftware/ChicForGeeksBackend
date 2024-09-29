@@ -30,8 +30,24 @@ export const defaultPolicies = [
                 },
             ],
         }),
+    },
+    {
+        name: "dynamodb-full-access-policy",
+        policy: JSON.stringify({
+            Version: "2012-10-17",
+            Statement: [
+                {
+                    Action: [
+                        "dynamodb:*" // Grants full DynamoDB access
+                    ],
+                    Resource: "arn:aws:dynamodb:*:*:table/*", // Applies to all DynamoDB tables
+                    Effect: "Allow",
+                },
+            ],
+        }),
     }
 ];
+
 export const defaultAssumeRolePolicies = JSON.stringify({
     Version: "2012-10-17",
     Statement: [

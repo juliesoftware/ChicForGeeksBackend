@@ -1,9 +1,0 @@
-{
-  "name": "average-plan-count",
-  "includeLibs": true,
-  "dependencies": [
-    "axios@0.27.2"
-  ],
-  "appsync": [
-  ]
-}

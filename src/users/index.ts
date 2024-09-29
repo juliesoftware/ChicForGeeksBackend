@@ -6,7 +6,7 @@ const PREFIX = "users";
 export default {
     generate: async (): Promise<UserPool> => {
         const pool = new UserPool(generateName(PREFIX, "users"), {
-            name: generateName(PREFIX, "nomadago"),
+            name: generateName(PREFIX, "coach"),
             autoVerifiedAttributes: ["email"],
             accountRecoverySetting: {
                 recoveryMechanisms: [
@@ -46,21 +46,5 @@ export default {
         });
 
         return pool;
-    },
-    generateClient: async (pool: UserPool): Promise<UserPoolClient> => {
-        return new UserPoolClient(generateName(PREFIX, "test"), {
-            userPoolId: pool.id,
-            allowedOauthFlows: ["code", "implicit"],
-            allowedOauthScopes: ["email", "phone", "openid"],
-            allowedOauthFlowsUserPoolClient: true,
-            callbackUrls: ["https://www.nomadago.com/"],
-            logoutUrls: ["https://www.nomadago.com/"]
-        });
-    },
-    generateDomain: async (pool: UserPool): Promise<UserPoolDomain> => {
-        return new UserPoolDomain(generateName(PREFIX, "test"), {
-            userPoolId: pool.id,
-            domain: "nomadagolivesyst"
-        });
     }
 };
