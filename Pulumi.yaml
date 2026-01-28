@@ -1,3 +1,3 @@
-name: coach-aws-infrastructure
+name: chicforgeeks-aws-infrastructure
 runtime: nodejs
 description: A minimal AWS TypeScript Pulumi program

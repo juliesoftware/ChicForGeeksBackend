@@ -1,13 +1,5 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { connectToDatabase } from "../../../layer/mongodb";
 import { v4 as uuidv4 } from "uuid";
-
-// Create a DynamoDB client
-const dynamoDbClient = new DynamoDBClient({});
-const dynamoDb = DynamoDBDocumentClient.from(dynamoDbClient);
-
-// Define the table name
-const TABLE_NAME = process.env.MEAL_PLANS_TABLE || "MealPlans";
 
 interface MealPlanInput {
   name: string;
@@ -35,7 +27,8 @@ interface MealPlan {
 // Lambda function handler
 export const handler = async (event: any) => {
   const { userId, mealPlanInput } = event.arguments;
-  const { name, type, description, calories, proteins, fats, carbs } = mealPlanInput;
+  const { name, type, description, calories, proteins, fats, carbs } =
+    mealPlanInput;
 
   if (!userId || !name) {
     return {
@@ -49,7 +42,7 @@ export const handler = async (event: any) => {
   const mealPlanId = uuidv4();
   const date = new Date().toISOString();
 
-  const newMealPlan = {
+  const newMealPlan: MealPlan = {
     mealPlanId,
     userId,
     name,
@@ -62,13 +55,11 @@ export const handler = async (event: any) => {
     carbs: carbs || 0,
   };
 
-  const params = {
-    TableName: TABLE_NAME,
-    Item: newMealPlan,
-  };
-
   try {
-    await dynamoDb.send(new PutCommand(params));
+    const db = await connectToDatabase();
+    const collection = db.collection("mealPlans");
+
+    await collection.insertOne(newMealPlan);
 
     // Return the mealPlan directly in the response
     return {
@@ -84,4 +75,3 @@ export const handler = async (event: any) => {
     };
   }
 };
-

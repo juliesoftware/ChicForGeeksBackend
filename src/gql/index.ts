@@ -1,15 +1,24 @@
-import {DataSource, GraphQLApi, Resolver} from "@pulumi/aws/appsync";
-import {generateName, generateNameUnderscore, generateTags} from "../utils";
+import { DataSource, GraphQLApi, Resolver } from "@pulumi/aws/appsync";
+import { generateName, generateNameUnderscore, generateTags } from "../utils";
 import * as fs from "fs/promises";
-import {getPolicyDocumentOutput, Policy, Role, RolePolicyAttachment} from "@pulumi/aws/iam";
-import {LambdaEndpoint} from "../functions";
+import {
+  getPolicyDocumentOutput,
+  Policy,
+  Role,
+  RolePolicyAttachment,
+} from "@pulumi/aws/iam";
+import { LambdaEndpoint } from "../functions";
 import * as pulumi from "@pulumi/pulumi";
 import * as path from "path";
 
 let PREFIX = "gql";
 const config = new pulumi.Config();
 const userPoolId = config.require("userPoolId");
-const websocketFunctions = ["disconnect-channels", "connect-channels", "send-message"]
+const websocketFunctions = [
+  "disconnect-channels",
+  "connect-channels",
+  "send-message",
+];
 
 const BASE_RESPONSE = `
 #if($ctx.error)
@@ -46,114 +55,115 @@ $util.quiet($payload.put("request", $ctx.request))
 `;
 
 function generateRoleExec() {
-    const role = new Role(generateName(PREFIX, "log-role"), {
-        assumeRolePolicy: getPolicyDocumentOutput({
-            statements: [
+  const role = new Role(generateName(PREFIX, "log-role"), {
+    assumeRolePolicy: getPolicyDocumentOutput({
+      statements: [
+        {
+          actions: ["sts:AssumeRole"],
+          principals: [
+            {
+              identifiers: ["appsync.amazonaws.com"],
+              type: "Service",
+            },
+          ],
+          effect: "Allow",
+        },
+      ],
+    }).json,
+    tags: generateTags(PREFIX, "log-role"),
+  });
+
+  const policy = new Policy(generateName(PREFIX, "policy"), {
+    policy: getPolicyDocumentOutput({
+      statements: [
+        {
+          effect: "Allow",
+          actions: ["lambda:invokeFunction"],
+          resources: ["arn:aws:lambda:*:640168438272:function:*"],
+        },
                 {
-                    actions: ["sts:AssumeRole"],
-                    principals: [
-                        {
-                            identifiers: ["appsync.amazonaws.com"],
-                            type: "Service",
-                        },
-                    ],
                     effect: "Allow",
+                    actions: ["secretsmanager:GetSecretValue"],
+                    resources: ["arn:aws:secretsmanager:*:*:secret:chicforgeeks/*"],
                 },
-            ],
-        }).json,
-        tags: generateTags(PREFIX, "log-role"),
-    });
 
-    const policy = new Policy(generateName(PREFIX, "policy"), {
-        policy: getPolicyDocumentOutput({
-            statements: [
-                {
-                    effect: "Allow",
-                    actions: ["lambda:invokeFunction"],
-                    resources: ["arn:aws:lambda:*:640168438272:function:*"],
-                },
-            ],
-        }).json,
-    });
-
-    new RolePolicyAttachment(generateName(PREFIX, "rpa"), {
-        role: role,
-        policyArn: policy.arn,
-    });
-
-    return role;
+  return role;
 }
 
 export default {
-    generate: async (
-        functions: LambdaEndpoint[],
-        appName: string
-    ): Promise<{
-        api: GraphQLApi;
-    }> => {
-        PREFIX = appName;
+  generate: async (
+    functions: LambdaEndpoint[],
+    appName: string,
+  ): Promise<{
+    api: GraphQLApi;
+  }> => {
+    PREFIX = appName;
 
-        let authenticationType: string, authConfig: any;
+    let authenticationType: string, authConfig: any;
 
-        if (appName === 'gql') {
-            authenticationType = "AMAZON_COGNITO_USER_POOLS";
-            authConfig = {
-                awsRegion: "us-east-1",
-                defaultAction: "ALLOW",
-                userPoolId: userPoolId,
-            };
-        } else if (appName === 'web') {
-            authenticationType = "API_KEY";
-            authConfig = {};
-        } else {
-            throw new Error(`Invalid appName: ${appName}. Expected 'gql' or 'web'.`);
-        }
+    if (appName === "gql") {
+      authenticationType = "AMAZON_COGNITO_USER_POOLS";
+      authConfig = {
+        awsRegion: "us-east-1",
+        defaultAction: "ALLOW",
+        userPoolId: userPoolId,
+      };
+    } else if (appName === "web") {
+      authenticationType = "API_KEY";
+      authConfig = {};
+    } else {
+      throw new Error(`Invalid appName: ${appName}. Expected 'gql' or 'web'.`);
+    }
 
-        const api = new GraphQLApi(generateName(PREFIX, "appsync"), {
-            authenticationType: authenticationType,
-            ...(authenticationType === "AMAZON_COGNITO_USER_POOLS" ? {userPoolConfig: authConfig} : {apiKeyConfig: authConfig}),
-            name: generateName(PREFIX, "coach"),
-            schema: (await fs.readFile(path.join("src", "gql", "schema", "schema.graphql"))).toString("utf-8"),
-            tags: generateTags(PREFIX, "appsync"),
-            xrayEnabled: true,
+    const api = new GraphQLApi(generateName(PREFIX, "appsync"), {
+      authenticationType: authenticationType,
+      ...(authenticationType === "AMAZON_COGNITO_USER_POOLS"
+        ? { userPoolConfig: authConfig }
+        : { apiKeyConfig: authConfig }),
+      name: generateName(PREFIX, "chicforgeeks"),
+      schema: (
+        await fs.readFile(path.join("src", "gql", "schema", "schema.graphql"))
+      ).toString("utf-8"),
+      tags: generateTags(PREFIX, "appsync"),
+      xrayEnabled: true,
+    });
+
+    const role = generateRoleExec();
+    functions.forEach((fn: LambdaEndpoint) => {
+      const fDataSource = new DataSource(
+        generateName(PREFIX, `${fn.config.name}-ds`),
+        {
+          apiId: api.id,
+          name: generateNameUnderscore(PREFIX, fn.config.functionName),
+          type: "AWS_LAMBDA",
+          serviceRoleArn: role.arn,
+          lambdaConfig: {
+            functionArn: fn.lambda.arn,
+          },
+        },
+      );
+      if (fn.config.appsync && !websocketFunctions.includes(fn.config.name)) {
+        fn.config.appsync.forEach((appsyncConfig: any) => {
+          new Resolver(
+            generateName(
+              PREFIX,
+              `${fn.config.name}-${appsyncConfig.resolver.field}-resolver`,
+            ),
+            {
+              apiId: api.id,
+              dataSource: fDataSource.name,
+              requestTemplate: BASE_REQUEST(
+                appsyncConfig.batch ?? false,
+                appsyncConfig.resolver.field,
+              ),
+              responseTemplate: BASE_RESPONSE,
+              ...appsyncConfig.resolver,
+            },
+          );
         });
+      }
+    });
 
-        const role = generateRoleExec();
-        functions.forEach((fn: LambdaEndpoint) => {
-            const fDataSource = new DataSource(
-                generateName(PREFIX, `${fn.config.name}-ds`),
-                {
-                    apiId: api.id,
-                    name: generateNameUnderscore(PREFIX, fn.config.functionName),
-                    type: "AWS_LAMBDA",
-                    serviceRoleArn: role.arn,
-                    lambdaConfig: {
-                        functionArn: fn.lambda.arn,
-                    },
-                }
-            );
-            if (fn.config.appsync && !websocketFunctions.includes(fn.config.name)) {
-                fn.config.appsync.forEach((appsyncConfig: any) => {
-                    new Resolver(
-                        generateName(
-                            PREFIX,
-                            `${fn.config.name}-${appsyncConfig.resolver.field}-resolver`
-                        ),
-                        {
-                            apiId: api.id,
-                            dataSource: fDataSource.name,
-                            requestTemplate: BASE_REQUEST(
-                                appsyncConfig.batch ?? false,
-                                appsyncConfig.resolver.field
-                            ),
-                            responseTemplate: BASE_RESPONSE,
-                            ...appsyncConfig.resolver,
-                        }
-                    );
-                });
-            }
-        });
-
-        return {api};
-    },
+    return { api };
+  },
 };

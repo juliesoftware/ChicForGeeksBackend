@@ -1,70 +1,66 @@
 export const defaultPolicies = [
-    {
-        name: "log-policy",
-        policy: JSON.stringify({
-            Version: "2012-10-17",
-            Statement: [
-                {
-                    Action: [
-                        "logs:CreateLogGroup",
-                        "logs:CreateLogStream",
-                        "logs:PutLogEvents",
-                    ],
-                    Resource: "arn:aws:logs:*:*:*",
-                    Effect: "Allow",
-                },
-            ],
-        }),
-    },
-    {
-        name: "update-user-attribute-policy",
-        policy: JSON.stringify({
-            Version: "2012-10-17",
-            Statement: [
-                {
-                    Action: [
-                        "cognito-idp:AdminUpdateUserAttributes"
-                    ],
-                    Resource: "arn:aws:cognito-idp:*:*:*",
-                    Effect: "Allow",
-                },
-            ],
-        }),
-    },
-    {
-        name: "dynamodb-full-access-policy",
-        policy: JSON.stringify({
-            Version: "2012-10-17",
-            Statement: [
-                {
-                    Action: [
-                        "dynamodb:*" // Grants full DynamoDB access
-                    ],
-                    Resource: "arn:aws:dynamodb:*:*:table/*", // Applies to all DynamoDB tables
-                    Effect: "Allow",
-                },
-            ],
-        }),
-    }
+  {
+    name: "log-policy",
+    policy: JSON.stringify({
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+          ],
+          Resource: "arn:aws:logs:*:*:*",
+          Effect: "Allow",
+        },
+      ],
+    }),
+  },
+  {
+    name: "update-user-attribute-policy",
+    policy: JSON.stringify({
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: ["cognito-idp:AdminUpdateUserAttributes"],
+          Resource: "arn:aws:cognito-idp:*:*:*",
+          Effect: "Allow",
+        },
+      ],
+    }),
+  },
+  {
+    name: "secrets-manager-policy",
+    policy: JSON.stringify({
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: ["secretsmanager:GetSecretValue"],
+          Resource: "arn:aws:secretsmanager:*:*:secret:chicforgeeks/*",
+          Effect: "Allow",
+        },
+      ],
+    }),
+  },
 ];
 
 export const defaultAssumeRolePolicies = JSON.stringify({
-    Version: "2012-10-17",
-    Statement: [
-        {
-            Action: "sts:AssumeRole",
-            Principal: {
-                Service: "appsync.amazonaws.com",
-            },
-            Effect: "Allow",
-        },
-        {
-            Effect: "Allow",
-            Principal: {
-                Service: "lambda.amazonaws.com",
-            },
-            Action: "sts:AssumeRole",
-        },
-    ],
-})
+  Version: "2012-10-17",
+  Statement: [
+    {
+      Action: "sts:AssumeRole",
+      Principal: {
+        Service: "appsync.amazonaws.com",
+      },
+      Effect: "Allow",
+    },
+    {
+      Effect: "Allow",
+      Principal: {
+        Service: "lambda.amazonaws.com",
+      },
+      Action: "sts:AssumeRole",
+    },
+  ],
+});
 export const SERVICE_PREFIX = "service";

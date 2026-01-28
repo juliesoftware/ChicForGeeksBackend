@@ -1,5 +1,5 @@
 config:
-  coach-aws-infrastructure:stage: syst
-  coach-aws-infrastructure:userPoolId: us-east-1_6hKxG4efk
-  coach-aws-infrastructure:webClientId: 5hvv18h418vd1mf45lq7peo846
-  coach-aws:region: us-east-1
+  chicforgeeks-aws-infrastructure:stage: syst
+  chicforgeeks-aws-infrastructure:userPoolId: us-east-1_6hKxG4efk
+  chicforgeeks-aws-infrastructure:webClientId: 5hvv18h418vd1mf45lq7peo846
+  chicforgeeks-aws:region: us-east-1
